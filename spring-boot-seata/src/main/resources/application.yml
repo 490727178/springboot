@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: springbootseata
+  datasource:
+    # 动态数据源配置
+    dynamic:
+      primary: seata_account
+      druid: #以下是全局默认值，可以全局更改
+        initial-size: 0
+        max-active: 8
+        min-idle: 2
+        max-wait: -1
+        min-evictable-idle-time-millis: 30000
+        max-evictable-idle-time-millis: 30000
+        time-between-eviction-runs-millis: 0
+        validation-query: select 1
+        validation-query-timeout: -1
+        test-on-borrow: false
+        test-on-return: false
+        test-while-idle: true
+        pool-prepared-statements: true
+        max-open-prepared-statements: 100
+        filters: stat,wall
+        share-prepared-statements: true
+      # 配置需要的数据源
+      datasource:
+        # master为默认的数据源
+        seata_account:
+          username: root
+          password: 123456
+          url: jdbc:mysql://master:3306/seata_account?@useUnicode=true&characterEncoding=UTF-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
+          druid:
+            initial-size: 5
+        seata_order:
+          username: root
+          password: 123456
+          url: jdbc:mysql://master:3306/seata_order?@useUnicode=true&characterEncoding=UTF-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
+          druid:
+            initial-size: 6
+        seata_storage:
+          username: root
+          password: 123456
+          url: jdbc:mysql://master:3306/seata_storage?@useUnicode=true&characterEncoding=UTF-8&useSSL=false
+          driver-class-name: com.mysql.jdbc.Driver
+          druid:
+            initial-size: 6
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      field-strategy: not_empty
+      table-underline: true
+      db-type: mysql
+      logic-delete-value: 1 # �߼���ɾ��ֵ(Ĭ��Ϊ 1)
+      logic-not-delete-value: 0 # �߼�δɾ��ֵ(Ĭ��Ϊ 0)
+  mapper-locations: classpath:/mapper/*.xml
+  type-aliases-package: com.example.springbootseata.entity
+##seata配置,相当于registry.conf
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: springbootseata-group
+  service:
+    vgroup-mapping:
+      springbootseata-group: default
+    grouplist:
+      default: slave1:8091
